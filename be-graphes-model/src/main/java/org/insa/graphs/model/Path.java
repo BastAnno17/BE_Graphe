@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
 /**
  * <p>
  * Class representing a path between nodes in a graph.
@@ -29,13 +30,43 @@ public class Path {
      * 
      * @throws IllegalArgumentException If the list of nodes is not valid, i.e. two
      *         consecutive nodes in the list are not connected in the graph.
-     * 
-     * @deprecated Need to be implemented.
      */
     public static Path createFastestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
         List<Arc> arcs = new ArrayList<Arc>();
-        // TODO:
+        
+        if (nodes.size() == 0) {
+        	return new Path(graph);
+        }
+        
+        if (nodes.size() == 1) {
+        	return new Path(graph, nodes.get(0));
+        } 
+        
+        List<Arc> successeur = new ArrayList<Arc>();
+        Node origine = nodes.get(0);
+        for (int i=0; i< nodes.size() - 1; i++){
+        	Arc prochain = null; // initialise l'arc à ajouter
+    		if (origine.hasSuccessors()) {
+    			successeur = origine.getSuccessors(); //list successeur du point en cours
+    			double tempsMini = -1; // initialise le temps le plus court trouvé
+    			
+    			for(int j=0; j< successeur.size(); j++) {
+    				if (successeur.get(j).getDestination() == nodes.get(i+1)) {
+    					if (successeur.get(j).getMinimumTravelTime() < tempsMini || tempsMini <= 0) {
+    						prochain = successeur.get(j);
+    						tempsMini = successeur.get(j).getMinimumTravelTime();
+    					}
+    				}
+    			}
+    		}
+    		if (prochain == null) {
+				throw new IllegalArgumentException("Chemin Impossible");
+			}
+			arcs.add(prochain);
+			origine = nodes.get(i+1);
+    	}
+        
         return new Path(graph, arcs);
     }
 
@@ -50,13 +81,42 @@ public class Path {
      * 
      * @throws IllegalArgumentException If the list of nodes is not valid, i.e. two
      *         consecutive nodes in the list are not connected in the graph.
-     * 
-     * @deprecated Need to be implemented.
      */
     public static Path createShortestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
         List<Arc> arcs = new ArrayList<Arc>();
-        // TODO:
+
+        if (nodes.size() == 0) {
+        	return new Path(graph);
+        }
+        
+        if (nodes.size() == 1) {
+        	return new Path(graph, nodes.get(0));
+        } 
+        
+        List<Arc> successeur = new ArrayList<Arc>();
+        Node origine = nodes.get(0);
+        for (int i=0; i< nodes.size() - 1; i++){
+        	Arc prochain = null; // initialise l'arc à ajouter
+    		if (origine.hasSuccessors()) {
+    			successeur = origine.getSuccessors(); //list successeur du point en cours
+    			float distanceMini = -1; // initialise la distance la plus courte trouvée
+    			for(int j=0; j< successeur.size(); j++) {
+    				if (successeur.get(j).getDestination() == nodes.get(i+1)) {
+    					if (successeur.get(j).getLength() < distanceMini || distanceMini <= 0) {
+    						prochain = successeur.get(j);
+    						distanceMini = successeur.get(j).getLength();
+    					}
+    				}
+    			}
+    		}
+    		if (prochain == null) {
+				throw new IllegalArgumentException("Chemin Impossible");
+			}
+			arcs.add(prochain);
+			origine = nodes.get(i+1);
+    	}
+        
         return new Path(graph, arcs);
     }
 
@@ -197,12 +257,24 @@ public class Path {
      * </ul>
      * 
      * @return true if the path is valid, false otherwise.
-     * 
-     * @deprecated Need to be implemented.
      */
     public boolean isValid() {
-        // TODO:
-        return false;
+
+    	if (size() <= 1) {
+    		return true;
+    	}
+    	
+    	if (this.getArcs().get(0).getOrigin() != getOrigin()) {
+    		return false;
+    	}
+    	
+    	for(int i=0 ; i < size()-2; i++) {
+    		if (this.getArcs().get(i).getDestination() != this.getArcs().get(i+1).getOrigin()) {
+        		return false;
+        	}
+    	}
+    	
+        return true;
     }
 
     /**
@@ -210,11 +282,18 @@ public class Path {
      * 
      * @return Total length of the path (in meters).
      * 
-     * @deprecated Need to be implemented.
      */
     public float getLength() {
-        // TODO:
-        return 0;
+    	if (size() <= 1) {
+    		return 0;
+    	}
+    	
+    	float l = 0;
+    	for (Arc arc : this.getArcs()) {
+    		l += arc.getLength();
+    	}
+    	
+        return l;
     }
 
     /**
@@ -224,12 +303,10 @@ public class Path {
      * 
      * @return Time (in seconds) required to travel this path at the given speed (in
      *         kilometers-per-hour).
-     * 
-     * @deprecated Need to be implemented.
      */
     public double getTravelTime(double speed) {
-        // TODO:
-        return 0;
+    	
+        return getLength()/(speed)*3.6;
     }
 
     /**
@@ -237,12 +314,16 @@ public class Path {
      * on every arc.
      * 
      * @return Minimum travel time to travel this path (in seconds).
-     * 
-     * @deprecated Need to be implemented.
      */
     public double getMinimumTravelTime() {
-        // TODO:
-        return 0;
+    	
+    	float temps = 0;
+    	List<Arc> chemin = getArcs();
+    	for(int i=0; i < chemin.size(); i++) {
+    		temps += chemin.get(i).getMinimumTravelTime();
+    	}
+    	
+        return temps;
     }
 
 }
