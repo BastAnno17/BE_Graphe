@@ -1,7 +1,12 @@
 package org.insa.graphs.algorithm.shortestpath;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Vector;
+
+import org.insa.graphs.algorithm.AbstractSolution.Status;
 import org.insa.graphs.algorithm.utils.BinaryHeap;
 import org.insa.graphs.model.Node;
+import org.insa.graphs.model.Path;
 import org.insa.graphs.model.Arc;
 
 public class DijkstraAlgorithm extends ShortestPathAlgorithm {
@@ -16,49 +21,119 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         ShortestPathSolution solution = null;
         // TODO:
         
-       int taille = data.getGraph().getNodes().size();
-       BinaryHeap<Node> tas = new BinaryHeap<Node>();
-       Vector<Label> label = new Vector<Label>();
-       
-       //INITIALISATION
-       for (int i = 0; i < taille; i++){
-    	   Label aAjouter = new Label(i, false, Double.POSITIVE_INFINITY, 0);
-    	   label.add(aAjouter);
-       }
-       
-       int origine = data.getGraph().getNodes().indexOf(data.getOrigin());
-       label.get(origine).setCout(0);
-       tas.insert(data.getGraph().getNodes().get(origine));
-       // FIN INITIALISATION
-       
-       //ITERATION
-       while((label.get(data.getGraph().getNodes().indexOf(data.getDestination())).getMarque() == false) && true){ // true -> a completer : "file" non vide
-    	   Node x = tas.deleteMin();
-    	   int indexX = data.getGraph().getNodes().indexOf(x);
-           label.get(indexX).setMarque(true);
-           
-    	   for (Arc successeurs :  data.getGraph().getNodes().get(indexX).getSuccessors()) {
-    		   System.out.println("ICIiii");
-    		   Node y = successeurs.getDestination();
-    		   int indexY = data.getGraph().getNodes().indexOf(y);
-    		   if (label.get(indexY).getMarque() == false) {
-    			   
-    			   if (label.get(indexY).getCout() > label.get(indexX).getCout() + successeurs.getLength()) {
-    				  
-    				   label.get(indexY).setCout(label.get(indexX).getCout() + successeurs.getLength());
-    				   System.out.println("la");
-    				   tas.remove(y);
-    				   System.out.println("la");
-    				   tas.insert(y);
-    				   System.out.println("la");
-    				   
-    			   }
-    		   }
-    	   }
-       }
+        int taille = data.getGraph().getNodes().size();
+        BinaryHeap<Label> tas = new BinaryHeap<Label>();
+        Vector<Label> label = new Vector<Label>();
+        
+        //INITIALISATION
+        for (int i = 0; i < taille; i++){
+     	   Label aAjouter = new Label(i, false, Double.POSITIVE_INFINITY, -1);
+     	   label.add(aAjouter);
+        }
+        
+        int origine = data.getGraph().getNodes().indexOf(data.getOrigin());
+        label.get(origine).setCout(0);
+        tas.insert(label.get(origine));
+        // FIN INITIALISATION
+        
+        //ITERATION
+        while((label.get(data.getGraph().getNodes().indexOf(data.getDestination())).getMarque() == false) && true){ // true -> a completer : "file" non vide
+     	   Label x = tas.deleteMin();
+     	   int indexX = x.getSommet();
+           x.setMarque(true);
+            
+     	   for (Arc successeurs :  data.getGraph().getNodes().get(indexX).getSuccessors()) {
+     		   System.out.println("ICIiii");
+     		   Node noeudSuiv = successeurs.getDestination(); //ancien y
+     		   Label y = label.get(noeudSuiv.getId());
+     		   
+     		   if (y == null) {
+     			  System.out.println("Bof");
+     		   }
+     		   
+     		   
+     		   int indexY = y.getSommet(); // ?
+     		   if (y.getMarque() == false) {
+     			   
+     			   if (y.getCout() > x.getCout() + successeurs.getLength()) {
+     				   y.setCout(x.getCout() + (int)successeurs.getLength());
+     				   System.out.println("la");
+     				   try{
+     					   tas.remove(y);
+     				   }catch(Exception ElementNotFoundException) {}
+     				   System.out.println("la");
+     				   tas.insert(y);
+     				   System.out.println("la");
+     				   
+     			   }
+     		   }
+     	   }
+        }
+        
+        int x = data.getGraph().getNodes().indexOf(data.getDestination());
+        Label X = label.get(x);
+        while(X.getPere() != -1) {
+        	
+        }
+        ArrayList<Arc> arcs = new ArrayList<>();
+        while(x.get)
+        
+        
+        Arc arc = predecessorArcs[data.getDestination().getId()];
+        while (arc != null) {
+            arcs.add(arc);
+            arc = predecessorArcs[arc.getOrigin().getId()];
+        }
+
+        // Reverse the path...
+        Collections.reverse(arcs);
        
        System.out.println("ICI");
+       solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
+       
        return solution;
     }
 
 }
+
+
+/* int taille = data.getGraph().getNodes().size();
+BinaryHeap<Node> tas = new BinaryHeap<Node>();
+Vector<Label> label = new Vector<Label>();
+
+//INITIALISATION
+for (int i = 0; i < taille; i++){
+	   Label aAjouter = new Label(i, false, Double.POSITIVE_INFINITY, 0);
+	   label.add(aAjouter);
+}
+
+int origine = data.getGraph().getNodes().indexOf(data.getOrigin());
+label.get(origine).setCout(0);
+tas.insert(data.getGraph().getNodes().get(origine));
+// FIN INITIALISATION
+
+//ITERATION
+while((label.get(data.getGraph().getNodes().indexOf(data.getDestination())).getMarque() == false) && true){ // true -> a completer : "file" non vide
+	   Node x = tas.deleteMin();
+	   int indexX = data.getGraph().getNodes().indexOf(x);
+    label.get(indexX).setMarque(true);
+    
+	   for (Arc successeurs :  data.getGraph().getNodes().get(indexX).getSuccessors()) {
+		   System.out.println("ICIiii");
+		   Node y = successeurs.getDestination();
+		   int indexY = data.getGraph().getNodes().indexOf(y);
+		   if (label.get(indexY).getMarque() == false) {
+			   
+			   if (label.get(indexY).getCout() > label.get(indexX).getCout() + successeurs.getLength()) {
+				  
+				   label.get(indexY).setCout(label.get(indexX).getCout() + successeurs.getLength());
+				   System.out.println("la");
+				   tas.remove(y);
+				   System.out.println("la");
+				   tas.insert(y);
+				   System.out.println("la");
+				   
+			   }
+		   }
+	   }
+} */
