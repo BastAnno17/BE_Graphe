@@ -39,6 +39,10 @@ public class Label implements Comparable<Label> {
 		return this.pere;
 	}
 	
+	public void setPere(int p) {
+		this.pere = p;
+	}
+	
 	@Override
     public int compareTo(Label other) {
         return Double.compare(getCout(), other.getCout());

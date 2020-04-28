@@ -8,6 +8,8 @@ import org.insa.graphs.algorithm.utils.BinaryHeap;
 import org.insa.graphs.model.Node;
 import org.insa.graphs.model.Path;
 import org.insa.graphs.model.Arc;
+import org.insa.graphs.model.Graph;
+
 
 public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
@@ -36,6 +38,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         tas.insert(label.get(origine));
         // FIN INITIALISATION
         
+        int nbArc = 0;
+        int nbIter = 0;
+        
+        
         //ITERATION
         while((label.get(data.getGraph().getNodes().indexOf(data.getDestination())).getMarque() == false) && true){ // true -> a completer : "file" non vide
      	   Label x = tas.deleteMin();
@@ -43,54 +49,67 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
            x.setMarque(true);
             
      	   for (Arc successeurs :  data.getGraph().getNodes().get(indexX).getSuccessors()) {
-     		   System.out.println("ICIiii");
+     		   nbIter += 1;
+     		   notifyNodeReached(successeurs.getDestination());
+     		   
      		   Node noeudSuiv = successeurs.getDestination(); //ancien y
      		   Label y = label.get(noeudSuiv.getId());
-     		   
-     		   if (y == null) {
-     			  System.out.println("Bof");
-     		   }
-     		   
+
      		   
      		   int indexY = y.getSommet(); // ?
-     		   if (y.getMarque() == false) {
+     		   if(data.isAllowed(successeurs)) {
+     			 if (y.getMarque() == true) {
+     				if (y.getCout() > x.getCout() + successeurs.getLength()) {
+      				   y.setCout(x.getCout() + (int)successeurs.getLength());
+      				   y.setPere(indexX);
+      				   try{
+      					   tas.remove(y);
+      				   }catch(Exception ElementNotFoundException) {}
+      				   tas.insert(y);
+      				   
+      			   }
+       		     }
+     			 
+
      			   
-     			   if (y.getCout() > x.getCout() + successeurs.getLength()) {
-     				   y.setCout(x.getCout() + (int)successeurs.getLength());
-     				   System.out.println("la");
-     				   try{
-     					   tas.remove(y);
-     				   }catch(Exception ElementNotFoundException) {}
-     				   System.out.println("la");
-     				   tas.insert(y);
-     				   System.out.println("la");
-     				   
-     			   }
-     		   }
+    		   }
+     		   
      	   }
         }
         
-        int x = data.getGraph().getNodes().indexOf(data.getDestination());
-        Label X = label.get(x);
-        while(X.getPere() != -1) {
-        	
-        }
-        ArrayList<Arc> arcs = new ArrayList<>();
-        while(x.get)
-        
-        
-        Arc arc = predecessorArcs[data.getDestination().getId()];
-        while (arc != null) {
-            arcs.add(arc);
-            arc = predecessorArcs[arc.getOrigin().getId()];
-        }
-
-        // Reverse the path...
-        Collections.reverse(arcs);
+       Graph graph = data.getGraph();
        
-       System.out.println("ICI");
-       solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
        
+       if (label.get(data.getGraph().getNodes().indexOf(data.getDestination())).getMarque() == false) {
+           solution = new ShortestPathSolution(data, Status.INFEASIBLE);
+       }
+       else {
+    	   ArrayList<Arc> arcs = new ArrayList<>();
+           Arc arc;
+            
+            int x = data.getGraph().getNodes().indexOf(data.getDestination()); //x un point et X son label
+            Label X = label.get(x);
+            while(X.getPere() != -1) {
+            	for (Arc successeurs :  data.getGraph().getNodes().get(X.getPere()).getSuccessors()) {
+            		if( successeurs.getDestination() == data.getGraph().getNodes().get(x)) {
+            			arc = successeurs;
+            			arcs.add(arc);
+            			nbArc += 1;
+            		}
+            	}
+            	x = X.getPere();
+            	if(x != -1) {
+            		X = label.get(x);
+            	}
+            }
+            
+            Collections.reverse(arcs);
+            
+            solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, arcs));
+       }
+       
+       System.out.println(nbIter);
+       System.out.println(nbArc);
        return solution;
     }
 
