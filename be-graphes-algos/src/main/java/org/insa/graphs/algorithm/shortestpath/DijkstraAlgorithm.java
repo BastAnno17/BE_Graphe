@@ -47,33 +47,20 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
      	   Label x = tas.deleteMin();
      	   int indexX = x.getSommet();
            x.setMarque(true);
-            
+           //notifyNodeReached(data.getGraph().getNodes().get(x.getSommet()));
      	   for (Arc successeurs :  data.getGraph().getNodes().get(indexX).getSuccessors()) {
      		   nbIter += 1;
      		   notifyNodeReached(successeurs.getDestination());
+     		   
+     		   if(data.isAllowed(successeurs)) {
+     			   
+     		   }
      		   
      		   Node noeudSuiv = successeurs.getDestination(); //ancien y
      		   Label y = label.get(noeudSuiv.getId());
 
      		   
-     		   int indexY = y.getSommet(); // ?
-     		   if(data.isAllowed(successeurs)) {
-     			 if (y.getMarque() == true) {
-     				if (y.getCout() > x.getCout() + successeurs.getLength()) {
-      				   y.setCout(x.getCout() + (int)successeurs.getLength());
-      				   y.setPere(indexX);
-      				   try{
-      					   tas.remove(y);
-      				   }catch(Exception ElementNotFoundException) {}
-      				   tas.insert(y);
-      				   
-      			   }
-       		     }
-     			 
-
-     			   
-    		   }
-     		   
+     		   marquage(x, y, successeurs, indexX, tas);
      	   }
         }
         
@@ -111,6 +98,23 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
        System.out.println(nbIter);
        System.out.println(nbArc);
        return solution;
+    }
+    
+    
+    public void marquage(Label x, Label y, Arc successeurs, int indexX, BinaryHeap<Label> tas) {
+		if (y.getMarque() == false) {
+			   
+			if (y.getCoutTotal() > x.getCoutTotal() + successeurs.getLength()) {
+				y.setCout(x.getCout() + (int)successeurs.getLength());  //TO DO:
+				y.setPere(indexX);
+				try{
+					tas.remove(y);
+				}catch(Exception ElementNotFoundException) {}
+				tas.insert(y);
+				
+				//System.out.println(successeurs.getDestination().getPoint());
+			}
+		}
     }
 
 }

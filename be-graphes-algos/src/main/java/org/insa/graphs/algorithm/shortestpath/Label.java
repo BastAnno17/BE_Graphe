@@ -1,6 +1,6 @@
 package org.insa.graphs.algorithm.shortestpath;
 
-import org.insa.graphs.model.Node;
+//import org.insa.graphs.model.Node;
 
 public class Label implements Comparable<Label> {
 	private int sommetCourrant;
@@ -43,8 +43,12 @@ public class Label implements Comparable<Label> {
 		this.pere = p;
 	}
 	
+	public double getCoutTotal() {
+		return getCout();
+	}
+	
 	@Override
     public int compareTo(Label other) {
-        return Double.compare(getCout(), other.getCout());
+        return Double.compare(getCoutTotal(), other.getCoutTotal());
     }
 }
