@@ -60,7 +60,19 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
      		   Label y = label.get(noeudSuiv.getId());
 
      		   
-     		   marquage(x, y, successeurs, indexX, tas);
+
+     		   if (y.getMarque() == false) {
+     			   
+     			   if (y.getCoutTotal() > x.getCoutTotal() + successeurs.getLength()) {
+     				   y.setCout(x.getCout() + (int)successeurs.getLength());  //TO DO:
+     				   y.setPere(indexX);
+     				   try{
+     					   tas.remove(y);
+     				   }catch(Exception ElementNotFoundException) {}
+     				   tas.insert(y);
+     				   
+     			   }
+     		   }
      	   }
         }
         
@@ -98,23 +110,6 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
        System.out.println(nbIter);
        System.out.println(nbArc);
        return solution;
-    }
-    
-    
-    public void marquage(Label x, Label y, Arc successeurs, int indexX, BinaryHeap<Label> tas) {
-		if (y.getMarque() == false) {
-			   
-			if (y.getCoutTotal() > x.getCoutTotal() + successeurs.getLength()) {
-				y.setCout(x.getCout() + (int)successeurs.getLength());  //TO DO:
-				y.setPere(indexX);
-				try{
-					tas.remove(y);
-				}catch(Exception ElementNotFoundException) {}
-				tas.insert(y);
-				
-				//System.out.println(successeurs.getDestination().getPoint());
-			}
-		}
     }
 
 }
